@@ -7,3 +7,4 @@ set -eu
 cd hybrid-v35_64-nodebug-pcoem-6_30_223_271
 make "-j$(nproc)"
 sudo make install
+sudo depmod -a

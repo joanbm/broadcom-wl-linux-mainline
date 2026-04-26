@@ -11,6 +11,7 @@ sudo apt install git wget build-essential linux-headers-generic
 git clone https://github.com/joanbm/broadcom-wl-linux-mainline
 cd broadcom-wl-linux-mainline
 ./install
+sudo modprobe wl
 ```
 
 # Scripts
