@@ -1,0 +1,15 @@
+--- a/src/wl/sys/wl_linux.c
++++ b/src/wl/sys/wl_linux.c
+@@ -500,12 +500,6 @@
+ #endif
+ }
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
+-static inline void eth_hw_addr_set(struct net_device *dev, const void *addr) {
+-	memcpy(dev->dev_addr, addr, ETHER_ADDR_LEN);
+-}
+-#endif
+-
+ static wl_info_t *
+ wl_attach(uint16 vendor, uint16 device, ulong regs,
+ 	uint bustype, void *btparam, uint irq, uchar* bar1_addr, uint32 bar1_size)

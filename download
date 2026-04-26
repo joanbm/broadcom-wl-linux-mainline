@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -eu
+
+[ "$#" -ne 0 ] && { echo "No arguments expected" >&2; exit 1; }
+
+if ! [ -f hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz ]; then
+  wget "https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz" -O hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz.tmp
+  mv hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz.tmp hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz
+fi
+
+echo "6855781f7c69a9aecb9461932423688964879d5a4df571f01ae7adaa7bf21a410bef839605d555afb6c8f4eec92fe8510af6cb120930095617ff6cdcccedaf17 hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz" | sha512sum -c

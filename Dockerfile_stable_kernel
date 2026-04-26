@@ -1,0 +1,25 @@
+# Test the build against the latest stable kernel
+FROM registry.fedoraproject.org/fedora:latest
+
+RUN dnf -y copr enable @kernel-vanilla/stable \
+    && dnf -y update \
+    && dnf -y install --setopt=install_weak_deps=False \
+        wget \
+        gcc make patch \
+        kernel-devel \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+WORKDIR /app
+
+COPY . .
+
+# Create entrypoint script to set up kernel build paths
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'KERNEL_BASE_DIR=$(echo /usr/src/kernels/*)' \
+    'KBUILD_DIR=$KERNEL_BASE_DIR exec "$@"' \
+  > /entrypoint.sh && chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["./buildtest"]

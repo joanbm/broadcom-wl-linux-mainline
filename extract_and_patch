@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+set -eu
+
+[ "$#" -ne 0 ] && { echo "No arguments expected" >&2; exit 1; }
+
+./download
+
+rm -rf hybrid-v35_64-nodebug-pcoem-6_30_223_271
+mkdir hybrid-v35_64-nodebug-pcoem-6_30_223_271
+tar xf hybrid-v35_64-nodebug-pcoem-6_30_223_271.tar.gz -C hybrid-v35_64-nodebug-pcoem-6_30_223_271
+
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+apply_patch() {
+    patch -Np1 -i "$SCRIPTPATH/patches/$1"
+}
+
+cd hybrid-v35_64-nodebug-pcoem-6_30_223_271
+apply_patch 001-null-pointer-fix.patch
+apply_patch 002-rdtscl.patch
+apply_patch 003-linux47.patch
+apply_patch 004-linux48.patch
+apply_patch 005-debian-fix-kernel-warnings.patch
+apply_patch 006-linux411.patch
+apply_patch 007-linux412.patch
+apply_patch 008-linux415.patch
+apply_patch 009-fix_mac_profile_discrepancy.patch
+apply_patch 010-linux56.patch
+apply_patch 011-linux59.patch
+apply_patch 012-linux517.patch
+apply_patch 013-linux518.patch
+apply_patch 014-linux414.patch
+apply_patch 015-linux600.patch
+apply_patch 016-linux601.patch
+apply_patch 017-linux612.patch
+apply_patch 018-linux613.patch
+apply_patch 019-linux614.patch
+apply_patch 020-linux615.patch
+apply_patch 021-linux617.patch
+apply_patch 022-linux71.patch
+if [ -n "${BROADCOM_WL_APPLY_STAGING_PATCHES:-}" ]; then
+    true
+fi
+apply_patch 901-remove-already-backported-eth_hw_addr_set-shim.patch
+apply_patch 900-fixup-gcc-detection-logic.patch
