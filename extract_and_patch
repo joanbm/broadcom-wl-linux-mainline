@@ -37,6 +37,7 @@ apply_patch 019-linux614.patch
 apply_patch 020-linux615.patch
 apply_patch 021-linux617.patch
 apply_patch 022-linux71.patch
+apply_patch 023-linux72.patch
 if [ -n "${BROADCOM_WL_APPLY_STAGING_PATCHES:-}" ]; then
     true
 fi
