@@ -2,7 +2,7 @@ From 971e6f229e155e8a0bd958a53d6d5d76bcac1c17 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
 Date: Sun, 8 Mar 2026 15:34:41 +0000
 Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux
- Next-20260306
+ 7.1-rc1
 
 ---
  src/wl/sys/wl_cfg80211_hybrid.c | 58 +++++++++++++++++++++++++++++----
