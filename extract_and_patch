@@ -17,15 +17,15 @@ apply_patch() {
 cd hybrid-v35_64-nodebug-pcoem-6_30_223_271
 apply_patch 001-null-pointer-fix.patch
 apply_patch 002-rdtscl.patch
-apply_patch 003-linux47.patch
-apply_patch 004-linux48.patch
+apply_patch 003-linux407.patch
+apply_patch 004-linux408.patch
 apply_patch 005-debian-fix-kernel-warnings.patch
 apply_patch 006-linux411.patch
 apply_patch 007-linux412.patch
 apply_patch 008-linux415.patch
 apply_patch 009-fix_mac_profile_discrepancy.patch
-apply_patch 010-linux56.patch
-apply_patch 011-linux59.patch
+apply_patch 010-linux506.patch
+apply_patch 011-linux509.patch
 apply_patch 012-linux517.patch
 apply_patch 013-linux518.patch
 apply_patch 014-linux414.patch
@@ -36,8 +36,8 @@ apply_patch 018-linux613.patch
 apply_patch 019-linux614.patch
 apply_patch 020-linux615.patch
 apply_patch 021-linux617.patch
-apply_patch 022-linux71.patch
-apply_patch 023-linux72.patch
+apply_patch 022-linux701.patch
+apply_patch 023-linux702.patch
 if [ -n "${BROADCOM_WL_APPLY_STAGING_PATCHES:-}" ]; then
     true
 fi
