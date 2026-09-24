@@ -1,0 +1,40 @@
+From e5be73ecad8a316d83d44bba22f25ec78f13cd20 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
+Date: Thu, 24 Sep 2026 14:32:59 +0000
+Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux
+ Next-20260923
+
+The .ndo_do_ioctl has not been called since many kernel versions,
+so removing it ensurely shouldn't break anything.
+---
+ src/wl/sys/wl_linux.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/wl/sys/wl_linux.c b/src/wl/sys/wl_linux.c
+index 07a4acb..4130b23 100644
+--- a/src/wl/sys/wl_linux.c
++++ b/src/wl/sys/wl_linux.c
+@@ -460,14 +460,20 @@ static const struct net_device_ops wl_netdev_ops =
+ #else
+ 	.ndo_set_multicast_list = wl_set_multicast_list,
+ #endif
++#if LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
++	// Rel. commit "net: remove ndo_do_ioctl handler" (Arnd Bergmann, 15 Sep 2026)
+ 	.ndo_do_ioctl = wl_ioctl
++#endif
+ };
+ 
+ static const struct net_device_ops wl_netdev_monitor_ops =
+ {
+ 	.ndo_start_xmit = wl_monitor_start,
+ 	.ndo_get_stats = wl_get_stats,
++#if LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
++	// Rel. commit "net: remove ndo_do_ioctl handler" (Arnd Bergmann, 15 Sep 2026)
+ 	.ndo_do_ioctl = wl_ioctl
++#endif
+ };
+ #endif 
+ 
+-- 
+2.55.0
+

@@ -39,7 +39,7 @@ apply_patch 021-linux617.patch
 apply_patch 022-linux701.patch
 apply_patch 023-linux702.patch
 if [ -n "${BROADCOM_WL_APPLY_STAGING_PATCHES:-}" ]; then
-    true
+    apply_patch 099-linuxnext.patch
 fi
 apply_patch 901-remove-already-backported-eth_hw_addr_set-shim.patch
 apply_patch 900-fixup-gcc-detection-logic.patch
