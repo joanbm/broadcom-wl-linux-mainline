@@ -1,15 +1,87 @@
-From e5be73ecad8a316d83d44bba22f25ec78f13cd20 Mon Sep 17 00:00:00 2001
+From a8652d62aa49e0f10d48344af58d557265558f05 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
 Date: Thu, 24 Sep 2026 14:32:59 +0000
 Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux
- Next-20260923
+ Next-20260929
 
 The .ndo_do_ioctl has not been called since many kernel versions,
 so removing it ensurely shouldn't break anything.
 ---
- src/wl/sys/wl_linux.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/wl/sys/wl_cfg80211_hybrid.c | 39 +++++++++++++++++++++++++++++----
+ src/wl/sys/wl_linux.c           |  6 +++++
+ 2 files changed, 41 insertions(+), 4 deletions(-)
 
+diff --git a/src/wl/sys/wl_cfg80211_hybrid.c b/src/wl/sys/wl_cfg80211_hybrid.c
+index a70d888..34170f4 100644
+--- a/src/wl/sys/wl_cfg80211_hybrid.c
++++ b/src/wl/sys/wl_cfg80211_hybrid.c
+@@ -131,7 +131,19 @@ static s32 wl_cfg80211_config_default_key(struct wiphy *wiphy,
+ static s32 wl_cfg80211_config_default_key(struct wiphy *wiphy,
+            struct net_device *dev, u8 key_idx);
+ #endif
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
++static s32 wl_cfg80211_add_key(struct wiphy *wiphy, struct wireless_dev *wdev,
++           int link_id, u8 key_idx, enum nl80211_key_type type,
++           const u8 *mac_addr, struct key_params *params);
++static s32 wl_cfg80211_del_key(struct wiphy *wiphy, struct wireless_dev *wdev,
++           int link_id, u8 key_idx, enum nl80211_key_type type,
++           const u8 *mac_addr);
++static s32 wl_cfg80211_get_key(struct wiphy *wiphy, struct wireless_dev *wdev,
++           int link_id, u8 key_idx, enum nl80211_key_type type,
++           const u8 *mac_addr, void *cookie,
++           void (*callback) (void *cookie, struct key_params *params));
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
+ static s32 wl_cfg80211_add_key(struct wiphy *wiphy, struct wireless_dev *wdev,
+            int link_id, u8 key_idx, bool pairwise, const u8 *mac_addr,
+            struct key_params *params);
+@@ -1242,7 +1254,13 @@ wl_cfg80211_config_default_key(struct wiphy *wiphy,
+ 	return 0;
+ }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
++static s32
++wl_cfg80211_add_key(struct wiphy *wiphy, struct wireless_dev *wdev,
++                    int link_id, u8 key_idx, enum nl80211_key_type type,
++                    const u8 *mac_addr, struct key_params *params)
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
+ static s32
+ wl_cfg80211_add_key(struct wiphy *wiphy, struct wireless_dev *wdev,
+                     int link_id, u8 key_idx, bool pairwise, const u8 *mac_addr,
+@@ -1376,7 +1394,13 @@ wl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *dev,
+ 	return err;
+ }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
++static s32
++wl_cfg80211_del_key(struct wiphy *wiphy, struct wireless_dev *wdev,
++                    int link_id, u8 key_idx, enum nl80211_key_type type,
++                    const u8 *mac_addr)
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
+ static s32
+ wl_cfg80211_del_key(struct wiphy *wiphy, struct wireless_dev *wdev,
+                     int link_id, u8 key_idx, bool pairwise, const u8 *mac_addr)
+@@ -1430,7 +1454,14 @@ wl_cfg80211_del_key(struct wiphy *wiphy, struct net_device *dev,
+ 	return err;
+ }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
++static s32
++wl_cfg80211_get_key(struct wiphy *wiphy, struct wireless_dev *wdev,
++                    int link_id, u8 key_idx, enum nl80211_key_type type,
++                    const u8 *mac_addr, void *cookie,
++                    void (*callback) (void *cookie, struct key_params * params))
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
+ static s32
+ wl_cfg80211_get_key(struct wiphy *wiphy, struct wireless_dev *wdev,
+                     int link_id, u8 key_idx, bool pairwise, const u8 *mac_addr,
 diff --git a/src/wl/sys/wl_linux.c b/src/wl/sys/wl_linux.c
 index 07a4acb..4130b23 100644
 --- a/src/wl/sys/wl_linux.c
@@ -36,5 +108,5 @@ index 07a4acb..4130b23 100644
  #endif 
  
 -- 
-2.55.0
+2.56.0
 
