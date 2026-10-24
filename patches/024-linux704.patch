@@ -1,7 +1,7 @@
 From a8652d62aa49e0f10d48344af58d557265558f05 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
 Date: Thu, 24 Sep 2026 14:32:59 +0000
-Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux
+Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux 7.4-rc1
  Next-20260929
 
 The .ndo_do_ioctl has not been called since many kernel versions,
@@ -20,7 +20,7 @@ index a70d888..34170f4 100644
             struct net_device *dev, u8 key_idx);
  #endif
 -#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 4, 0)
 +// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
 +static s32 wl_cfg80211_add_key(struct wiphy *wiphy, struct wireless_dev *wdev,
 +           int link_id, u8 key_idx, enum nl80211_key_type type,
@@ -41,7 +41,7 @@ index a70d888..34170f4 100644
  }
  
 -#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 4, 0)
 +// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
 +static s32
 +wl_cfg80211_add_key(struct wiphy *wiphy, struct wireless_dev *wdev,
@@ -56,7 +56,7 @@ index a70d888..34170f4 100644
  }
  
 -#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 4, 0)
 +// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
 +static s32
 +wl_cfg80211_del_key(struct wiphy *wiphy, struct wireless_dev *wdev,
@@ -71,7 +71,7 @@ index a70d888..34170f4 100644
  }
  
 -#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 1, 0)
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 4, 0)
 +// Rel. commit "wifi: cfg80211: add Control Integrity Protocol (CIP) APIs" (Benjamin Berg, 21 Sep 2026)
 +static s32
 +wl_cfg80211_get_key(struct wiphy *wiphy, struct wireless_dev *wdev,
@@ -90,7 +90,7 @@ index 07a4acb..4130b23 100644
  #else
  	.ndo_set_multicast_list = wl_set_multicast_list,
  #endif
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(7, 4, 0)
 +	// Rel. commit "net: remove ndo_do_ioctl handler" (Arnd Bergmann, 15 Sep 2026)
  	.ndo_do_ioctl = wl_ioctl
 +#endif
@@ -100,7 +100,7 @@ index 07a4acb..4130b23 100644
  {
  	.ndo_start_xmit = wl_monitor_start,
  	.ndo_get_stats = wl_get_stats,
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(7, 4, 0)
 +	// Rel. commit "net: remove ndo_do_ioctl handler" (Arnd Bergmann, 15 Sep 2026)
  	.ndo_do_ioctl = wl_ioctl
 +#endif
