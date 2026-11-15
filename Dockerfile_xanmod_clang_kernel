@@ -1,0 +1,32 @@
+# Test the build against the XanMod kernel, which is built with clang
+FROM docker.io/library/debian:stable
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        wget ca-certificates gnupg lsb-release \
+        build-essential \
+    && wget -qO - https://dl.xanmod.org/archive.key | gpg --dearmor -vo /etc/apt/keyrings/xanmod-archive-keyring.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/xanmod-release.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        linux-xanmod-x64v3 \
+        libelf-dev clang lld llvm \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY . .
+
+# The kernel is built with clang, so build the modules with it too
+ENV LLVM=1 CC=clang
+
+# Create entrypoint script to set up kernel build paths
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'KERNEL_BASE_DIR=$(echo /lib/modules/*)' \
+    'KBUILD_DIR=$KERNEL_BASE_DIR/build exec "$@"' \
+  > /entrypoint.sh && chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["./buildtest"]
