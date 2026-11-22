@@ -2,7 +2,6 @@ From a8652d62aa49e0f10d48344af58d557265558f05 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
 Date: Thu, 24 Sep 2026 14:32:59 +0000
 Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux 7.4-rc1
- Next-20260929
 
 The .ndo_do_ioctl has not been called since many kernel versions,
 so removing it ensurely shouldn't break anything.
