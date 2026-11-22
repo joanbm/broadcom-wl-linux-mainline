@@ -1,0 +1,117 @@
+From 582f32df6e2aee6ec877fe5ddf35881a1eeaaf4d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
+Date: Sun, 22 Nov 2026 08:12:54 +0000
+Subject: [PATCH] Tentative patch for broadcom-wl 6.30.223.271 driver for Linux
+ Next-20261120
+
+---
+ src/wl/sys/wl_linux.c | 42 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 33 insertions(+), 9 deletions(-)
+
+diff --git a/src/wl/sys/wl_linux.c b/src/wl/sys/wl_linux.c
+index bb37e23..183140b 100644
+--- a/src/wl/sys/wl_linux.c
++++ b/src/wl/sys/wl_linux.c
+@@ -3324,9 +3324,14 @@ static int
+ wl_proc_read(char *buffer, char **start, off_t offset, int length, int *eof, void *data)
+ {
+ 	wl_info_t * wl = (wl_info_t *)data;
+-#else
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
+ static ssize_t
+ wl_proc_read(struct file *filp, char __user *buffer, size_t length, loff_t *offp)
++{
++	wl_info_t * wl = PDE_DATA(file_inode(filp));
++#else
++static ssize_t
++wl_proc_read(struct file *filp, char *buffer, size_t length, loff_t *offp)
+ {
+ 	wl_info_t * wl = PDE_DATA(file_inode(filp));
+ #endif
+@@ -3364,10 +3369,14 @@ wl_proc_read(struct file *filp, char __user *buffer, size_t length, loff_t *offp
+ 		WL_ERROR(( "%s: user buffer is too small (%d < %d)", __FUNCTION__, (int)length, len));
+ 		return -EMSGSIZE;
+ 	}
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++	memcpy(buffer, tmp, len);
++#else
+ 	if (copy_to_user(buffer, tmp, len) != 0) {
+ 		WL_ERROR(( "%s: unable to copy data!", __FUNCTION__));
+ 		return -EFAULT;
+ 	}
++#endif
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
+ 	*offp += len;
+@@ -3381,9 +3390,14 @@ static int
+ wl_proc_write(struct file *filp, const char *buff, unsigned long length, void *data)
+ {
+ 	wl_info_t * wl = (wl_info_t *)data;
+-#else
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
+ static ssize_t
+ wl_proc_write(struct file *filp, const char __user *buff, size_t length, loff_t *offp)
++{
++	wl_info_t * wl = PDE_DATA(file_inode(filp));
++#else
++static ssize_t
++wl_proc_write(struct file *filp, char *buff, size_t length, loff_t *offp)
+ {
+ 	wl_info_t * wl = PDE_DATA(file_inode(filp));
+ #endif
+@@ -3395,14 +3409,19 @@ wl_proc_write(struct file *filp, const char __user *buff, size_t length, loff_t
+ 		WL_ERROR(("%s: Invalid data length\n", __FUNCTION__));
+ 		return -EIO;
+ 	}
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+ 	if (copy_from_user(&from_user, buff, 1)) {
+ 		WL_ERROR(("%s: copy from user failed\n", __FUNCTION__));
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+ 		return -EIO;
+-#else
++	}
++#elif LINUX_VERSION_CODE < KERNEL_VERSION(999, 0, 0)
++	if (copy_from_user(&from_user, buff, 1)) {
++		WL_ERROR(("%s: copy from user failed\n", __FUNCTION__));
+ 		return -EFAULT;
+-#endif
+ 	}
++#else
++	memcpy(&from_user, buff, 1);
++#endif
+ 
+ 	if (from_user >= 0x30)
+ 		from_user -= 0x30;
+@@ -3418,20 +3437,25 @@ wl_proc_write(struct file *filp, const char __user *buff, size_t length, loff_t
+ 	return length;
+ }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(999, 0, 0)
++// Rel. commit "proc: drop ->proc_read() and ->proc_read_iter()" (Christian Brauner, 3 Nov 2026)
++// Rel. commit "proc: drop ->proc_write()" (Christian Brauner, 31 Oct 2026)
++static struct proc_ops wl_fops = {
++	.proc_read_buf	= wl_proc_read,
++	.proc_write_buf	= wl_proc_write,
++};
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
+ static struct proc_ops wl_fops = {
+         .proc_read     = wl_proc_read,
+         .proc_write    = wl_proc_write,
+ };
+-#else
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
+ static const struct file_operations wl_fops = {
+ 	.owner	= THIS_MODULE,
+ 	.read	= wl_proc_read,
+ 	.write	= wl_proc_write,
+ };
+ #endif
+-#endif
+ 
+ static int
+ wl_reg_proc_entry(wl_info_t *wl)
+-- 
+2.56.1
+
