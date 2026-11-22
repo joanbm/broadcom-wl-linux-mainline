@@ -42,5 +42,6 @@ apply_patch 024-linux704.patch
 if [ -n "${BROADCOM_WL_APPLY_STAGING_PATCHES:-}" ]; then
     apply_patch 025-linuxnext.patch
 fi
-apply_patch 901-remove-already-backported-eth_hw_addr_set-shim.patch
 apply_patch 900-fixup-gcc-detection-logic.patch
+apply_patch 901-remove-already-backported-eth_hw_addr_set-shim.patch
+apply_patch 902-fix-linux65-ubsan-warnings.patch
